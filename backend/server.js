@@ -11,17 +11,35 @@ app.use(cors({
 app.use(express.json());
 
 const dbo = require("./db/conn");
-const CSVfile = require('./routes/RoomTracker/csvFile');  // Import the CSV route
 
 const port = process.env.PORT || 4000;
 
+// Import the route files
+const roomRoutes = require('./routes/RoomTracker/roomRoutes');
+const trainingRoutes = require('./routes/TrainingTracker/trainingRoutes');
+const purchaseRoutes = require('./routes/PurchaseTracker/purchaseRoutes');
 
-app.use('/upload', CSVfile);
+// Register the routes
+app.use('/roomtracker', roomRoutes);
+app.use('/trainingtracker', trainingRoutes);
+app.use('/purchasetracker', purchaseRoutes);
 
+// Listen to the server and connect to the RoomTracker database
 app.listen(port, () => {
-    dbo.connectToServer((err) => {
+    dbo.connectToServer('RoomTracker', (err) => {
         if (err) console.error(err);
-        else console.log("Successfully connected to MongoDB");
+        else console.log("Successfully connected to RoomTracker MongoDB");
     });
+    
+    dbo.connectToServer('TrainingTracker', (err) => {
+        if (err) console.error(err);
+        else console.log("Successfully connected to TrainingTracker MongoDB");
+    });
+
+    dbo.connectToServer('PurchaseTracker', (err) => {
+        if (err) console.error(err);
+        else console.log("Successfully connected to PurchaseTracker MongoDB");
+    });
+
     console.log(`Server is running on port ${port}`);
 });

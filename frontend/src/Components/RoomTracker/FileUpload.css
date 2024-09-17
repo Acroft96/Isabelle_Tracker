@@ -1,11 +1,10 @@
-/* Parent container to center the upload box */
 body, html {
     height: 100%;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0; /* Optional: Add a background color */
+    background-color: #f0f0f0; 
   }
   
   .file-upload-container {
@@ -25,9 +24,7 @@ body, html {
     background-color: #e0f7fa;
   }
   
-  /* .file-upload-content {
-    pointer-events: none;
-  } */
+  
   
   .file-upload-icon {
     width: 40px;
@@ -42,8 +39,7 @@ body, html {
   }
   
   .file-upload-input {
-    /* display: none;  Hidden input for file selection */
-    z-index: -1;  /* This could cause the input to block button clicks */
+    z-index: -1;  
 
   }
   
