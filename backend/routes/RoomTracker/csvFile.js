@@ -4,7 +4,7 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
-const dbo = require('../db/conn');
+const dbo = require('../../db/conn');
 
 // Configure multer for file upload
 const upload = multer({ dest: 'uploads/' });
