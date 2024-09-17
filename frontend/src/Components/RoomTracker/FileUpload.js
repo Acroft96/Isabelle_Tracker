@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import './FileUpload.css';  // Assuming your styling is in this file
+import './FileUpload.css';  
 
 function FileUpload() {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadStatus, setUploadStatus] = useState(null);
-  const fileInputRef = useRef();  // Ref for file input
+  const fileInputRef = useRef();  
 
   // Drag and Drop Handlers
   const handleDragEnter = (e) => {
@@ -69,7 +69,7 @@ function FileUpload() {
     console.log("Submitting file:", file); // Log the file being submitted
 
     const formData = new FormData();
-    formData.append('csvfile', file);
+    formData.append('csvFile', file);
 
     try {
       const response = await fetch('http://localhost:4000/upload', {
@@ -104,17 +104,16 @@ function FileUpload() {
       <div className="file-upload-content">
         <p>Drag & Drop your file here or</p>
 
-        {/* Hidden file input */}
         <input 
           type="file"
           className="file-upload-input"
-          ref={fileInputRef}  // Use the ref to reference the input element
+          ref={fileInputRef}  
           accept=".csv"
           onChange={handleFileSelect}
-          style={{ display: 'none' }}  // Hide the file input
+          style={{ display: 'none' }}  
         />
 
-        <button onClick={() => fileInputRef.current.click()}>  {/* Trigger the file input using the ref */}
+        <button onClick={() => fileInputRef.current.click()}>  
           Choose File
         </button>
         

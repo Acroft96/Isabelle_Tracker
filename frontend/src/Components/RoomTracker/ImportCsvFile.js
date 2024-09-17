@@ -37,15 +37,15 @@ function ImportCSVFile() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Success:', data); // Log the success response
+        console.log('Success:', data); 
         alert('CSV uploaded and processed successfully');
       } else {
-        const errorData = await response.text();  // Log error body for debugging
+        const errorData = await response.text();  
         console.error('Upload failed:', errorData);
-        console.log("Response status:", response.status); // Log response status if upload fails
+        console.log("Response status:", response.status);
       }
     } catch (error) {
-      console.error('Error:', error); // Log any errors
+      console.error('Error:', error); 
     }
   };
 
