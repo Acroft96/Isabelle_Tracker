@@ -10,7 +10,7 @@ const dbo = require('../db/conn');
 const upload = multer({ dest: 'uploads/' });
 
 // Route to handle CSV file upload
-router.post('/', upload.single('csvfile'), (req, res) => {  
+router.post('/', upload.single('CSVfile'), (req, res) => {  
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
     }
