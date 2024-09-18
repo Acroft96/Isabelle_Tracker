@@ -3,14 +3,13 @@ const cors = require("cors");
 require("dotenv").config({ path: "./config.env" });
 
 const app = express();
+const dbo = require("./db/conn");
 
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }));
 app.use(express.json());
-
-const dbo = require("./db/conn");
 
 const port = process.env.PORT || 4000;
 
@@ -24,22 +23,27 @@ app.use('/roomtracker', roomRoutes);
 app.use('/trainingtracker', trainingRoutes);
 app.use('/purchasetracker', purchaseRoutes);
 
-// Listen to the server and connect to the RoomTracker database
-app.listen(port, () => {
-    dbo.connectToServer('RoomTracker', (err) => {
-        if (err) console.error(err);
-        else console.log("Successfully connected to RoomTracker MongoDB");
-    });
-    
-    dbo.connectToServer('TrainingTracker', (err) => {
-        if (err) console.error(err);
-        else console.log("Successfully connected to TrainingTracker MongoDB");
-    });
+// Sequentially connect to all the required databases
+async function connectDatabases() {
+    try {
+        await new Promise((resolve, reject) => dbo.connectToServer('RoomTracker', (err) => err ? reject(err) : resolve()));
+        console.log("Successfully connected to RoomTracker MongoDB");
 
-    dbo.connectToServer('PurchaseTracker', (err) => {
-        if (err) console.error(err);
-        else console.log("Successfully connected to PurchaseTracker MongoDB");
-    });
+        await new Promise((resolve, reject) => dbo.connectToServer('TrainingTracker', (err) => err ? reject(err) : resolve()));
+        console.log("Successfully connected to TrainingTracker MongoDB");
 
-    console.log(`Server is running on port ${port}`);
+        await new Promise((resolve, reject) => dbo.connectToServer('PurchaseTracker', (err) => err ? reject(err) : resolve()));
+        console.log("Successfully connected to PurchaseTracker MongoDB");
+
+    } catch (err) {
+        console.error("Error connecting to databases: ", err);
+        process.exit(1);  // Exit the process on database connection error
+    }
+}
+
+// Start the server after successfully connecting to databases
+connectDatabases().then(() => {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
 });

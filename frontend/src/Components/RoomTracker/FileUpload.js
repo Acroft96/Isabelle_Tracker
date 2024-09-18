@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import './FileUpload.css';  
+import { Button, Form, Alert, Card } from 'react-bootstrap'; // Using Bootstrap components
 
 function FileUpload() {
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadStatus, setUploadStatus] = useState(null);
-  const fileInputRef = useRef();  
+  const fileInputRef = useRef();  // Ref for file input
 
   // Drag and Drop Handlers
   const handleDragEnter = (e) => {
@@ -34,7 +34,6 @@ function FileUpload() {
     if (selectedFile) {
       validateFile(selectedFile);
       console.log("File selected:", selectedFile); // Log the selected file
-
     }
   };
 
@@ -60,31 +59,31 @@ function FileUpload() {
   // Handle CSV file submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!file) {
       alert("Please upload a CSV file.");
       return;
     }
-
-    console.log("Submitting file:", file); // Log the file being submitted
-
+  
+    console.log("Submitting file:", file);
+  
     const formData = new FormData();
     formData.append('csvFile', file);
-
+  
     try {
-      const response = await fetch('http://localhost:4000/upload', {
+      const response = await fetch('http://localhost:4000/roomtracker/upload', {  
         method: 'POST',
         body: formData,
       });
-
+  
       if (response.ok) {
         const data = await response.json();
         console.log('Success:', data);
         alert('CSV uploaded and processed successfully');
         setUploadStatus('Success');
-        discardFile();  // Reset the file input after successful upload
+        discardFile();  
       } else {
-        const errorData = await response.text(); 
+        const errorData = await response.text();
         console.error('Upload failed:', errorData);
         setUploadStatus('Failed');
       }
@@ -95,47 +94,76 @@ function FileUpload() {
   };
 
   return (
-    <div className="file-upload-container"
-         onDragEnter={handleDragEnter}
-         onDragLeave={handleDragLeave}
-         onDragOver={(e) => e.preventDefault()}
-         onDrop={handleDrop}>
-      
-      <div className="file-upload-content">
-        <p>Drag & Drop your file here or</p>
+    <Card
+      className={`p-4 ${isDragging ? 'bg-info' : 'bg-light'}`} 
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop}
+      style={{ maxWidth: '400px', margin: 'auto' }} 
+    >
+      <Card.Body>
+        <p className="text-center mb-3">Drag & Drop your file here or</p>
 
-        <input 
-          type="file"
-          className="file-upload-input"
-          ref={fileInputRef}  
-          accept=".csv"
-          onChange={handleFileSelect}
-          style={{ display: 'none' }}  
-        />
+        <Form.Group controlId="formFile" className="mb-3">
+          <Form.Control
+            type="file"
+            ref={fileInputRef}
+            accept=".csv"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }} 
+          />
+          <Button 
+            variant="primary" 
+            onClick={() => fileInputRef.current.click()}
+            className="w-100 mb-3"
+          >
+            Choose File
+          </Button>
+        </Form.Group>
 
-        <button onClick={() => fileInputRef.current.click()}>  
-          Choose File
-        </button>
-        
         {file && (
-          <div className="file-info">
-            <p>Selected File: {file.name}</p>
-            <button onClick={discardFile}>Discard File (X)</button>
+          <div className="file-info mb-4">
+            <Alert variant="info" className="d-flex justify-content-between align-items-center">
+              <span>Selected File: {file.name}</span>
+              <Button 
+                variant="" 
+                size="sm" 
+                onClick={discardFile}
+                className="ml-2"
+              >
+                X
+              </Button>
+            </Alert>
           </div>
         )}
 
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-        {file && (
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
-            <button type="submit">Upload CSV</button>
-          </form>
+        {errorMessage && (
+          <Alert variant="danger">
+            {errorMessage}
+          </Alert>
         )}
 
-        {uploadStatus === 'Success' && <p >Upload completed successfully!</p>}
-        {uploadStatus === 'Failed' && <p style={{ color: 'red' }}>Upload failed. Please try again.</p>}
-      </div>
-    </div>
+        {file && (
+          <Form onSubmit={handleSubmit}>
+            <Button variant="success" type="submit" className="w-100">
+              Upload CSV
+            </Button>
+          </Form>
+        )}
+
+        {uploadStatus === 'Success' && (
+          <Alert variant="success" className="mt-3">
+            Upload completed successfully!
+          </Alert>
+        )}
+        {uploadStatus === 'Failed' && (
+          <Alert variant="danger" className="mt-3">
+            Upload failed. Please try again.
+          </Alert>
+        )}
+      </Card.Body>
+    </Card>
   );
 }
 

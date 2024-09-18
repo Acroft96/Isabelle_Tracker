@@ -1,10 +1,10 @@
 Create new branch
-git checkout -b updatedIsabelleFiles 
+git checkout -b RoomTracker 
 
 stage > commit > push
 git add .
 git commit -m "Updated files for Isabelle Tracker project"
-git push -u origin updatedIsabelleFiles
+git push -u origin RoomTracker
 
 Back to branch for pulling and pushing 
 git branch (verfiys which branch you are on)
@@ -12,3 +12,9 @@ git checkout main (or whatever branch you are wanting to pull from and push to)
 
 Undo your last commit
 git reset --soft HEAD~1
+
+
+
+
+
+This is the mondodb vscode string: 'mongodb+srv://blakekotter:blakey@isabelletracker.o0jzb.mongodb.net/'
