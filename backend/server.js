@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config({ path: "./config.env" });
@@ -15,11 +16,13 @@ const port = process.env.PORT || 4000;
 
 // Import the route files
 const roomRoutes = require('./routes/RoomTracker/roomRoutes');
+const officeHoursRoutes = require('./routes/RoomTracker/officeHoursRoutes'); // officeHoursRoutes import
 const trainingRoutes = require('./routes/TrainingTracker/trainingRoutes');
 const purchaseRoutes = require('./routes/PurchaseTracker/purchaseRoutes');
 
 // Register the routes
 app.use('/roomtracker', roomRoutes);
+app.use('/roomtracker', officeHoursRoutes); // officeHoursRoutes registered here
 app.use('/trainingtracker', trainingRoutes);
 app.use('/purchasetracker', purchaseRoutes);
 

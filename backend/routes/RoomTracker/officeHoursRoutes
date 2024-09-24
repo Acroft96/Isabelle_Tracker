@@ -1,0 +1,78 @@
+const express = require("express");
+const router = express.Router();
+const axios = require("axios"); // Import axios for HTTP requests
+const dbo = require("../../db/conn"); // Import the connection to MongoDB
+
+// Get all office hours data
+// officeHoursRoutes.js
+router.get("/officehours", async (req, res) => {
+  const db = dbo.getDb("RoomTracker"); // Connect to the RoomTracker database
+  const officeHoursCollection = db.collection("officehours");
+
+  try {
+    const officeHoursData = await officeHoursCollection.find({}).toArray(); // Fetch data from the officehours collection
+    res.json(officeHoursData); // Return all office hours data
+  } catch (error) {
+    console.error("Error fetching office hours data:", error);
+    res.status(500).json({ message: "Error fetching data" });
+  }
+});
+
+// Update office hours data
+router.post('/update', async (req, res) => {
+    const db = dbo.getDb('RoomTracker'); // Connect to the RoomTracker database
+    const officeHoursCollection = db.collection('officehours');
+    const updatedData = { ...req.body };  // Create a copy of the incoming data
+
+    // Remove the _id field as it's immutable
+    delete updatedData._id;
+
+    console.log('Data being updated:', updatedData); // Log data being updated
+
+    try {
+        // Assuming the timestamp is unique and used as an identifier to update the record
+        const result = await officeHoursCollection.updateOne(
+            { timestamp: updatedData.timestamp }, // Find the document with matching timestamp
+            { $set: updatedData },                // Update the document with new data
+            { upsert: true }                      // Insert if the document doesn't exist
+        );
+
+        console.log('Update result:', result);  // Log MongoDB update result
+
+        res.json({ status: 'Success' });
+    } catch (error) {
+        console.error("Error updating office hours data:", error);  // Log the error
+        res.status(500).json({ message: 'Error updating data' });
+    }
+});
+
+
+// Sync office hours data from Google Apps Script (AppsScript fetch route)
+router.get("/sync-officehours", async (req, res) => {
+  const db = dbo.getDb("RoomTracker"); // Connect to the RoomTracker database
+  const officeHoursCollection = db.collection("officehours");
+  const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbz6-dNJ5GwzhB0eXvhUTYB6QW4oRcsO4iZYHmUs91mg9jviwyvx7lHvUX1NQoce1Gay2Q/exec";
+
+  try {
+    // Fetch data from the Google Apps Script URL
+    const response = await axios.get(APPS_SCRIPT_URL);
+    const appsScriptData = response.data;
+
+    // Insert or update the data in MongoDB
+    for (const entry of appsScriptData) {
+      await officeHoursCollection.updateOne(
+        { timestamp: entry.Timestamp }, // Use timestamp as the unique identifier
+        { $set: entry }, // Update or insert the new entry
+        { upsert: true } // Insert if the document doesn't exist
+      );
+    }
+
+    res.json({ status: "Success", message: "Data synced from AppsScript" });
+  } catch (error) {
+    console.error("Error syncing data from AppsScript:", error);
+    res.status(500).json({ message: "Error syncing data" });
+  }
+});
+
+module.exports = router;
